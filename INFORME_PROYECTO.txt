@@ -1,0 +1,76 @@
+===================================================================
+# INFORME DETALLADO DEL PROYECTO: Scraper Masivo
+===================================================================
+
+Fecha de finalización: 2025-09-01
+
+## 1. Objetivo del Proyecto
+
+El objetivo principal fue migrar una aplicación de análisis de partidos de fútbol desarrollada en Streamlit (`estudio.py`) a una aplicación web completa y robusta usando el framework Flask. La nueva aplicación debía replicar al 100% la funcionalidad y los datos de la original, pero sirviéndola a través de una estructura de servidor web tradicional, mejorando la organización del código y la experiencia de usuario.
+
+---
+
+## 2. Fases del Desarrollo y Tareas Realizadas
+
+A continuación se detallan cronológicamente las acciones llevadas a cabo:
+
+### Fase 1: Análisis y Refactorización del Código Original
+
+1.  **Análisis Inicial**: Se comenzó leyendo el fichero `INSTRUCCIONES.txt` proporcionado, que describía la necesidad de convertir el script de Streamlit en una aplicación web con Flask.
+
+2.  **Creación del Módulo de Scraping (`modules/estudio_scraper.py`)**:
+    *   Se creó una nueva carpeta `modules` para organizar mejor el código.
+    *   Toda la lógica de extracción, parseo y análisis de datos que estaba en `estudio.py` fue transferida a un nuevo fichero `modules/estudio_scraper.py`.
+    *   Se eliminaron todas las dependencias y código específico de Streamlit (como `st.write`, `st.expander`, decoradores `@st.cache_resource`, etc.) para que el módulo fuera agnóstico a la interfaz.
+    *   Se consolidó la lógica en una función principal `obtener_datos_completos_partido(match_id)`, que recibe el ID de un partido y devuelve un diccionario de Python con absolutamente todos los datos y análisis de ese partido.
+
+3.  **Adaptación del Servidor Flask (`app.py`)**:
+    *   Se modificó el fichero `app.py` para que actuara como el orquestador principal.
+    *   Se mantuvo la lógica existente para obtener la lista de partidos de la página principal.
+    *   Se creó una nueva ruta dinámica `/estudio/<string:match_id>`.
+    *   Esta ruta llama a la función `obtener_datos_completos_partido` del nuevo módulo de scraping para obtener los datos del partido solicitado.
+    *   Finalmente, esta ruta renderiza la plantilla `templates/estudio.html`, pasándole todos los datos obtenidos para que la página se muestre de forma dinámica.
+
+### Fase 2: Creación y Corrección de las Plantillas Web (HTML)
+
+1.  **Actualización de la Página de Análisis (`templates/estudio.html`)**:
+    *   Se transformó la plantilla para que usara el motor de plantillas Jinja2 (el estándar de Flask).
+    *   Se implementó la lógica para mostrar dinámicamente todos los datos recibidos desde `app.py`, incluyendo clasificaciones, estadísticas O/U, análisis de mercado, etc.
+    *   Se creó la plantilla reutilizable `templates/stats_table.html` para mostrar las tablas de estadísticas de progresión de forma consistente.
+
+2.  **Corrección de Enlaces en la Página Principal (`templates/index.html`)**:
+    *   Se identificó que los botones de "Análisis" en la tabla de partidos apuntaban a una URL antigua de Streamlit (`:8501`).
+    *   Se corrigieron los enlaces para que apuntaran a la nueva ruta de Flask (`/estudio/{{ match.id }}`).
+
+### Fase 3: Depuración y Resolución de Errores
+
+A lo largo del proceso, se solucionaron varios errores críticos:
+
+1.  **`SyntaxError` en `estudio_scraper.py`**: Se corrigió un error de tipeo en una expresión regular dentro de la función `get_team_league_info_from_script_of`.
+
+2.  **`TemplateSyntaxError` en `estudio.html`**: Se detectó que la sintaxis `{% include '...' with ... %}` no era compatible con la versión de Jinja2 del entorno. Se solucionó reemplazándola por la sintaxis `{% set ... %}` y `{% include '...' %}`, que es más compatible.
+
+### Fase 4: Implementación de Nuevas Funcionalidades
+
+Una vez la aplicación fue funcional, se añadieron las siguientes mejoras solicitadas:
+
+1.  **Completar la Página de Análisis**: Se añadieron a `estudio.html` las secciones que faltaban para alcanzar el 100% de paridad con la app original:
+    *   Tabla de "Comparativas Indirectas".
+    *   Tabla de "Enfrentamientos Directos (H2H)".
+
+2.  **Mejoras en la Página Principal (`index.html`)**:
+    *   **Filtro por Hándicap**: Se añadió un botón para poder ver todos los partidos o solo aquellos que tuvieran un valor de Hándicap disponible (distinto de "N/A").
+    *   **Paginación ("Cargar más")**: Se implementó un botón "Cargar 5 partidos más" que permite al usuario ver más partidos sin tener que cargar una página nueva, actualizando la URL con un límite de partidos a mostrar.
+
+### Fase 5: Mejora de la Experiencia de Usuario
+
+1.  **Creación de Script de Inicio (`EMPEZAR_AQUI.bat`)**:
+    *   Para simplificar al máximo el uso de la aplicación, se creó un fichero `.bat` auto-ejecutable.
+    *   Este script se encarga de todo el proceso de forma automática: instala las dependencias de Python, instala los navegadores de Playwright y finalmente ejecuta la aplicación Flask.
+    *   Se refinó varias veces para solucionar problemas de entorno virtual y para que los mensajes y errores fueran lo más claros posible para el usuario.
+
+---
+
+## 3. Estado Final del Proyecto
+
+El proyecto se encuentra en un estado **completo y funcional**. La aplicación cumple con todos los requisitos solicitados, replicando y mejorando la funcionalidad de la versión original de Streamlit. El código está ahora mejor estructurado, es más mantenible y la aplicación es más fácil de usar gracias al script de inicio.
