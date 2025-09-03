@@ -1,6 +1,7 @@
 streamlit
-playwright
+requests
 beautifulsoup4
 pandas
+lxml
+playwright==1.40.0  # Es buena práctica fijar la versión
 selenium
-requests
