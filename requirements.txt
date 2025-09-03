@@ -1,8 +1,7 @@
-Flask
+streamlit
 requests
 beautifulsoup4
 pandas
 lxml
 playwright==1.40.0
 selenium
-gunicorn  # <-- ¡Muy importante! Es el servidor web para producción.
