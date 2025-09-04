@@ -1,1 +1,1 @@
-chromium
+# No extra system packages required for Streamlit deployment.
