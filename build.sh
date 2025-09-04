@@ -6,5 +6,5 @@ set -o errexit
 pip install -r requirements.txt
 
 # 2. Instala los navegadores de Playwright
-#    Este comando es crucial para que el scraper funcione en la nube.
-playwright install --with-deps
+#    Evita dependencias del sistema para agilizar el despliegue.
+playwright install chromium
